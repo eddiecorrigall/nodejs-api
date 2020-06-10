@@ -1,26 +1,42 @@
 class AppError extends Error {
-    constructor(message, error) {
+    constructor(message) {
         super(message);
         this.name = 'AppError';
         this.stack = undefined;
+    }
+
+    setError(error) {
         if (error) {
             this.stack = error.stack;
         }
+        return this;
     }
 }
 
-class AppControllerError extends AppError {
-    constructor(message, error) {
+class AuthenticationError extends AppError {
+    constructor(message) {
         super(message);
-        this.name = 'AppControllerError';
-        this.stack = undefined;
-        if (error) {
-            this.stack = error.stack;
-        }
+        this.name = 'AuthenticationError';
+    }
+}
+
+class NotFoundError extends AppError {
+    constructor(message) {
+        super(message);
+        this.name = 'NotFoundError';
+    }
+}
+
+class ValidationError extends AppError {
+    constructor(message) {
+        super(message);
+        this.name = 'ValidationError';
     }
 }
 
 module.exports = {
-    AppError: AppError,
-    AppControllerError: AppControllerError,
+    AppError,
+    AuthenticationError,
+    NotFoundError,
+    ValidationError,
 };

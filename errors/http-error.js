@@ -1,43 +1,46 @@
+const { AppError } = require('@errors/app-error');
+
+
 /* References
  * - https://javascript.info/custom-errors
  * - http://expressjs.com/en/guide/error-handling.html
  */
 
-class HttpError extends Error {
+class HttpError extends AppError {
     /*
      Compatible Error for ExpressJS `next(err)`.
      */
-    constructor(statusMessage, statusCode, error) {
-        super(statusMessage);
+    constructor(message) {
+        super(message);
         this.name = 'HttpError';
-        this.stack = undefined;
-        if (error) {
-            this.stack = error.stack;
-        }
         // Express properties
-        this.statusMessage = statusMessage;
-        this.statusCode = statusCode || 500;
+        this.statusCode = 500;
+    }
+
+    setStatusCode(statusCode) {
+        this.statusCode = statusCode;
+        return this;
     }
 
     serialize() {
         return {
             error: {
                 statusCode: this.statusCode,
-                statusMessage: this.statusMessage,
-            }
-        }
+                statusMessage: this.message,
+            },
+        };
     }
 }
 
 const errorHandler = (err, req, res, next) => {
     if ((err instanceof HttpError) === false) {
-        err = new HttpError('Unhandled exception caught', null, err);
+        err = new HttpError('Unhandled exception caught').setError(err);
     }
     res.status(err.statusCode).send(err.serialize());
     return next();
 };
 
 module.exports = {
-    HttpError: HttpError,
-    errorHandler: errorHandler,
+    HttpError,
+    errorHandler,
 };

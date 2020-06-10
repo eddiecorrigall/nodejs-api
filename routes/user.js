@@ -16,8 +16,11 @@ router.get(`/:id`, async (req, res, next) => {
     try {
         user = await userController.getUserById(id);
     } catch (err) {
-        return next(new HttpError(
-            `Failed to get user by id ${id}`, 500, err));
+        return next(
+            new HttpError(`Failed to get user by id ${id}`)
+                .setStatusCode(500)
+                .setError(err)
+        );
     }
     let result;
     try {
@@ -25,8 +28,10 @@ router.get(`/:id`, async (req, res, next) => {
             data: [ user.serialize() ],
         };
     } catch (err) {
-        return next(new HttpError(
-            `Failed to serialize user with id ${id}`, null, err));
+        return next(
+            new HttpError(`Failed to serialize user with id ${id}`)
+                .setError(err)
+        );
     }
     return res.status(200).send(result);
 });
@@ -37,8 +42,10 @@ router.get('/', async (req, res, next) => {
     try {
         users = await userController.getUsers({ page, limit });
     } catch (err) {
-        return next(new HttpError(
-            `Failed to get users`, null, err));
+        return next(
+            new HttpError(`Failed to get users`)
+                .setError(err)
+        );
     }
     let result;
     try {
@@ -48,8 +55,10 @@ router.get('/', async (req, res, next) => {
             }),
         };
     } catch (err) {
-        return next(new HttpError(
-            `Failed to serialize list of users`, null, err));
+        return next(
+            new HttpError(`Failed to serialize list of users`)
+                .setError(err)
+        );
     }
     return res.status(200).send(result);
 });

@@ -12,8 +12,11 @@ router.post('/login', async (req, res, next) => {
         user = await userController.getUserByEmail(email);
         user.authenticate({ email, password });
     } catch (err) {
-        return next(new HttpError(
-            `Failed login for user with email ${email}`, 401, err));
+        return next(
+            new HttpError(`Failed login for user with email ${email}`)
+                .setStatusCode(401)
+                .setError(err)
+        );
     }
     return res.status(200).end();
 });

@@ -1,6 +1,11 @@
 const bcrypt = require('bcryptjs');
 
-const { AppError, AppControllerError } = require('@errors/app-error');
+const {
+    AuthenticationError,
+    NotFoundError,
+    ValidationError
+} = require('@errors/app-error');
+
 const UserModel = require('@models/user');
 
 const LIMIT = 100;
@@ -44,7 +49,7 @@ class User {
                 return;
             }
         }
-        throw new AppError('Failed authentication');
+        throw new AuthenticationError('Failed authentication');
     }
 
     get isAdmin() {
@@ -84,7 +89,7 @@ exports.getUserById = async (id) => {
     });
     // ...
     if (userEntity === null) {
-        throw new AppControllerError(`User ${id} does not exist`);
+        throw new NotFoundError(`User with id ${id} does not exist`);
     }
     return new User(userEntity);
 };
@@ -99,7 +104,7 @@ exports.getUserByEmail = async (email) => {
     });
     // ...
     if (userEntity === null) {
-        throw new AppControllerError(`User ${email} does not exist`);
+        throw new NotFoundError(`User with email ${email} does not exist`);
     }
     return new User(userEntity);
 };
@@ -111,7 +116,7 @@ exports.getUsers = async ({ limit = 10, page = 0 }) => {
     const userEntities = mockUsers;
     // ...
     if (userEntities === null) {
-        throw new AppControllerError('Failed to query list of users');
+        throw new NotFoundError('Failed to get list of users');
     }
     return userEntities.map((userEntity) => {
         return new User(userEntity);
