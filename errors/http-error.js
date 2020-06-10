@@ -32,15 +32,6 @@ class HttpError extends AppError {
     }
 }
 
-const errorHandler = (err, req, res, next) => {
-    if ((err instanceof HttpError) === false) {
-        err = new HttpError('Unhandled exception caught').setError(err);
-    }
-    res.status(err.statusCode).send(err.serialize());
-    return next();
-};
-
 module.exports = {
     HttpError,
-    errorHandler,
 };
