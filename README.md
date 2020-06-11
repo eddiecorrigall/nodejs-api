@@ -1,5 +1,4 @@
-# mongo-api
-MongoDB API Demo
+# MongoDB API MVC Demo
 
 
 Setup + Start Server
