@@ -16,7 +16,7 @@ List Users
 ```bash
 curl \
     --request GET \
-        http://localhost:8080/api/user
+        http://localhost:8080/api/users
 ```
 
 Get User
@@ -25,7 +25,7 @@ Get User
 ```bash
 curl \
     --request GET \
-        http://localhost:8080/api/user/123
+        http://localhost:8080/api/users/123
 ```
 
 Login
