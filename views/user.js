@@ -1,5 +1,6 @@
 const express = require('express');
 const userController = require('@controllers/user');
+const {NotFoundError} = require('@errors/app-error');
 const {HttpError} = require('@errors/http-error');
 
 const router = express.Router();
@@ -16,11 +17,11 @@ router.get(`/:id`, async (req, res, next) => {
     try {
         user = await userController.getUserById(id);
     } catch (err) {
-        return next(
-            new HttpError(`Failed to get user by id ${id}`)
-                .setStatusCode(500)
-                .setError(err)
-        );
+        const httpError = new HttpError(`Failed to get user by id ${id}`).setError(err);
+        if (err instanceof NotFoundError) {
+            httpError.setStatusCode(404);
+        }
+        return next(httpError);
     }
     let result;
     try {
@@ -42,10 +43,12 @@ router.get('/', async (req, res, next) => {
     try {
         users = await userController.getUsers({ page, limit });
     } catch (err) {
-        return next(
-            new HttpError(`Failed to get users`)
-                .setError(err)
-        );
+        const httpError = new HttpError(`Failed to get users`)
+            .setError(err);
+        if (err instanceof NotFoundError) {
+            httpError.setStatusCode(404);
+        }
+        return next(httpError);
     }
     let result;
     try {

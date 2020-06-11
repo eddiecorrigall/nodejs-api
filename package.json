@@ -28,6 +28,7 @@
     "@models": "./models",
     "@views": "./views",
     "@controllers": "./controllers",
-    "@errors": "./errors"
+    "@errors": "./errors",
+    "@middleware": "./middleware"
   }
 }
