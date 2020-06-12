@@ -1,10 +1,25 @@
 const url = require('url');
 const fetch = require('node-fetch');
+const NodeCache = require("node-cache");
 
 const {
     IntegrationError,
     ParseError,
-} = require('../errors/app-error');
+} = require('@errors/app-error');
+
+
+const imageCache = new NodeCache({
+    stdTTL: 60,
+    checkperiod: 120,
+});
+
+imageCache.on('set', (key, image) => {
+    console.log(`Image set with key ${key} and href ${image.href}`);
+});
+
+imageCache.on('expired', (key, image) => {
+    console.log(`Image expired with key ${key} and href ${image.href}`);
+});
 
 
 class Image {
@@ -14,6 +29,10 @@ class Image {
         this.width = width;
         this.height = height;
         this.format = format;
+    }
+
+    get key() {
+        return [this.id, this.width, this.height].join('.');
     }
 
     serialize() {
@@ -28,8 +47,8 @@ class Image {
 }
 
 
-exports.getRandomImage = async ({ width = 100, height = 100 }) => {
-    const requestUri = `https://picsum.photos/${width}/${height}`;
+const _getImageFromUri = async (uri) => {
+    const requestUri = uri;
     const requestOptions = {
         method: 'GET',
         redirect: 'manual',
@@ -61,4 +80,24 @@ exports.getRandomImage = async ({ width = 100, height = 100 }) => {
         throw new ParseError('Failed to parse random image url')
             .setError(err);
     }
+};
+
+
+exports.getRandomImage = async ({ width = 100, height = 100 }) => {
+    const image = await _getImageFromUri(`https://picsum.photos/${width}/${height}`);
+    imageCache.set(image.key, image);
+    return image;
+};
+
+exports.getImageById = async ({id, width = 100, height = 100 }) => {
+    let image = imageCache.get(`${id}.${width}.${height}`);
+    if (image === undefined) {
+        image = await _getImageFromUri(`https://picsum.photos/id/${id}/${width}/${height}`);
+        imageCache.set(image.key, image);
+    }
+    return image;
+};
+
+exports.flushImageCache = async () => {
+    imageCache.flushAll();
 };
