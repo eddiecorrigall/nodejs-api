@@ -2,7 +2,15 @@ const { HttpError } = require('@errors/http-error');
 
 const errorLogger = (err, req, res, next) => {
     if (err) {
-        console.error(err);
+        if (err instanceof HttpError) {
+            if (500 <= err.statusCode && err.statusCode < 600) {
+                // Log only 5xx level errors
+                console.error(err);
+            }
+        } else {
+            // Log all non HttpError's
+            console.error(err);
+        }
     }
     next(err);
 };
