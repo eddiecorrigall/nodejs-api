@@ -34,9 +34,25 @@ class ValidationError extends AppError {
     }
 }
 
+class IntegrationError extends AppError {
+    constructor(message) {
+        super(message);
+        this.name = 'ValidationError';
+    }
+}
+
+class ParseError extends AppError {
+    constructor(message) {
+        super(message);
+        this.name = 'ParseError';
+    }
+}
+
 module.exports = {
     AppError,
     AuthenticationError,
     NotFoundError,
     ValidationError,
+    IntegrationError,
+    ParseError,
 };

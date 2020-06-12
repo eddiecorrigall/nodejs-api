@@ -2,6 +2,7 @@ const express = require('express');
 const userController = require('@controllers/user');
 const {NotFoundError} = require('@errors/app-error');
 const {HttpError} = require('@errors/http-error');
+const {serializeItems} = require('@views');
 
 const router = express.Router();
 
@@ -23,18 +24,7 @@ router.get(`/:id`, async (req, res, next) => {
         }
         return next(httpError);
     }
-    let result;
-    try {
-        result = {
-            data: [ user.serialize() ],
-        };
-    } catch (err) {
-        return next(
-            new HttpError(`Failed to serialize user with id ${id}`)
-                .setError(err)
-        );
-    }
-    return res.status(200).send(result);
+    return serializeItems({ req, res, next, items: [user] });
 });
 
 router.get('/', async (req, res, next) => {
@@ -50,20 +40,7 @@ router.get('/', async (req, res, next) => {
         }
         return next(httpError);
     }
-    let result;
-    try {
-        result = {
-            data: users.map((user) => {
-                return user.serialize();
-            }),
-        };
-    } catch (err) {
-        return next(
-            new HttpError(`Failed to serialize list of users`)
-                .setError(err)
-        );
-    }
-    return res.status(200).send(result);
+    return serializeItems({ req, res, next, items: users });
 });
 
 module.exports = router;
